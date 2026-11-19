@@ -1,56 +1,33 @@
-# INFINITE FABRIC — 200 GB Workspace Specification
+# INFINITE FABRIC — 200 GiB Workspace Specification
 
-## Intent
-User wants a dedicated workspace experience targeting 200 GB. This is a storage/workspace goal, not RAM expansion, partitioning, or pre-reserving a fixed block of space.
+## Goal and current implementation
+The user wants a dedicated 200 GiB VANTA workspace on a 512 GB Galaxy S10. This is a logical quota target, not a partition, reserved block, or RAM expansion.
 
-## Capacity model
-Show separately:
-1. Target workspace quota (configured; default 200 GB).
-2. Actual directory content size (measured).
-3. Volume total capacity.
-4. Volume available/free bytes.
-5. Estimated app-private usage, if Android exposes it.
-6. Physical RAM and current system/app memory estimates.
-7. Cache and durable files separately.
+Current implementation:
+- Creates `files/vanta-fabric` inside VANTA's Android app-private sandbox.
+- Displays target quota (200 GiB), measured workspace usage, and actual free/total capacity on the app-data internal volume.
+- Reserves 2 GiB of free-space headroom from future VANTA writes.
+- Includes a quota guard that checks both remaining logical quota and real free capacity.
+- Does not yet provide a general file manager, import/export, or encrypted vault.
 
-Never show 200 GB as available unless the chosen volume actually supports that amount and free capacity is sufficient. A logical quota may exceed actual free space but must be clearly marked as a target and never permit writes beyond capacity.
+## What the number means
+1. Target workspace quota: 200 GiB.
+2. Actual directory content size: measured recursively.
+3. Internal volume total and free bytes: measured using StatFs on the app data volume.
+4. Physical RAM: separate metric; never mix it with storage figures.
 
-## User-controlled volume
-Use Android Storage Access Framework folder selection. Explain why folder access is needed. Persist URI permission if supported. User can revoke permission; detect and recover. Do not silently scan unrelated folders.
+A 200 GiB target is not a claim that 200 GiB is currently free. Every future write path must check quota and available capacity. Android may reject writes, so all I/O must handle storage-full and interruption errors.
 
-## Layout
-- ACTIVE: current mission outputs and active files.
-- CACHE: regenerable data; limited quota.
-- VAULT: durable knowledge and user-approved context.
-- ARCHIVE: inactive work, not automatically deleted.
-- MIRROR: virtual-environment assets and snapshots.
+## Privacy and safe-folder boundary
+App-private storage is protected by Android's per-app sandbox. It is not the same as Samsung Knox Secure Folder and is not yet separately encrypted by VANTA. Android Keystore-backed encryption is a future requirement before claiming a VANTA encrypted vault. Auto-backup is disabled in the current manifest; uninstalling the app removes its private workspace.
 
-## Write safety
-- Check free space before large writes and during long operations where possible.
-- Maintain configurable reserve margin.
-- Use temp file then atomic rename where supported.
-- Avoid interrupted/corrupt writes.
-- Track manifest, timestamps, hashes for integrity.
-- Offer cleanup candidates, but ask before deleting.
-- Automatic cleanup may only touch explicitly identified rebuildable cache with user-configured policy.
-- No deleting archive/user files automatically.
+## Future expansion
+- SAF-based user-selected storage locations, with explicit consent and persisted grants.
+- Vault encryption using Android Keystore, versioned file format and recovery/export flow.
+- ACTIVE, CACHE, VAULT, ARCHIVE and MIRROR areas with separate quotas.
+- Atomic writes, integrity hashes, resumable operations and low-space warnings.
+- Storage benchmark and full-device test on Galaxy S10.
+- Never silently scan unrelated folders or delete user data.
 
-## RAM and flash distinction
-- RAM is volatile physical memory used by active processes.
-- Flash/storage holds durable files.
-- Cache can reduce repeated work but consumes storage.
-- Android memory pressure may terminate processes.
-- Storage-backed paging is slower and increases write wear; it is not a promise of RAM expansion and should not be enabled as a magical boost.
-- VANTA should optimize memory use and gracefully release cache instead.
-
-## Tests
-- SAF grant and revocation.
-- External volume unplugged.
-- Low space and full volume.
-- Permission loss.
-- Interrupted write.
-- Quota exceeded.
-- Large directory scan without UI freeze.
-- Symlink/unsupported files and provider errors.
-- Export/import consistency.
-- Recovery from partial manifests.
+## RAM distinction
+RAM is volatile physical memory. Android/Linux manages memory pressure and zRAM. Flash storage is not RAM; using it as swap is slow and increases write wear. VANTA should use bounded caches, streaming I/O and graceful cache eviction instead of claiming storage-backed RAM.
