@@ -29,6 +29,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -44,6 +45,8 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.json.JSONArray
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 private val Obsidian = Color(0xFF080A0D)
 private val Panel = Color(0xFF131820)
@@ -83,6 +86,13 @@ private fun VantaApp() {
     var feedback by remember { mutableStateOf("Ready. Type help to see what VANTA can do offline.") }
     var activeModule by remember { mutableStateOf("OVERVIEW") }
     var showAllTasks by remember { mutableStateOf(false) }
+    var workspaceSnapshot by remember { mutableStateOf<WorkspaceSnapshot?>(null) }
+
+    LaunchedEffect(activeModule) {
+        if (activeModule == "FABRIC") {
+            workspaceSnapshot = withContext(Dispatchers.IO) { WorkspaceStorage.snapshot(context) }
+        }
+    }
 
     fun persist(key: String, values: List<String>) {
         val json = JSONArray()
@@ -248,6 +258,29 @@ private fun VantaApp() {
                                 notes.take(4).forEach { Text("•  $it", color = White, fontSize = 11.sp) }
                                 if (notes.isEmpty()) Text("No notes stored yet. Try: note Your first memory",
                                     color = Muted, fontSize = 11.sp)
+                            }
+                            if (activeModule == "FABRIC") {
+                                Text("INFINITE FABRIC · PRIVATE WORKSPACE", color = Amber,
+                                    fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                                val snapshot = workspaceSnapshot
+                                if (snapshot == null) {
+                                    Text("Measuring this device's app-private workspace…", color = Muted, fontSize = 11.sp)
+                                } else {
+                                    Text("TARGET QUOTA   200 GiB", color = White, fontSize = 13.sp,
+                                        fontWeight = FontWeight.Bold)
+                                    Text("USED   ${snapshot.usedBytes / WorkspaceQuota.GIB} GiB  ·  ${snapshot.quotaPercent}% of target",
+                                        color = White, fontSize = 11.sp)
+                                    Text("INTERNAL VOLUME FREE   ${snapshot.freeBytesOnInternalVolume / WorkspaceQuota.GIB} GiB",
+                                        color = White, fontSize = 11.sp)
+                                    Text("DEVICE VOLUME   ${snapshot.totalBytesOnInternalVolume / WorkspaceQuota.GIB} GiB total",
+                                        color = Muted, fontSize = 10.sp)
+                                    Text("SAFE HEADROOM   2 GiB reserved from VANTA writes",
+                                        color = Muted, fontSize = 10.sp)
+                                    Text("Private path: app sandbox / vanta-fabric",
+                                        color = Muted, fontSize = 10.sp)
+                                }
+                                Text("200 GiB is a logical ceiling, not preallocated space. Writes must pass both quota and real free-space checks. Android remains in control of storage.",
+                                    color = Muted, fontSize = 10.sp, lineHeight = 15.sp)
                             }
                         }
                     }
