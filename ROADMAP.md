@@ -9,7 +9,7 @@ Statuses: Implemented = coded and verified; Partial = incomplete; Planned = desi
 - [x] THE VEIL initial touch UI and module selection shell added.
 - [x] Directive input capture with honest not-connected status.
 - [ ] Gradle wrapper and reproducible local command-line build.\n- [x] GitHub Actions CI workflow configured for Android build, lint, unit tests and APK artifact.\n- [x] Deterministic offline DIRECTIVE parser and local task/note persistence added.\n- [x] Galaxy S10 installation and manual test guide added.
-- [ ] CI build, lint and unit tests pass (workflow configured; result pending).\n- [ ] Android Studio build and physical device tests.
+- [x] CI build, lint and unit tests pass on commit `114270c` (Android CI run #8).\n- [x] Debug APK artifact published for device testing.\n- [ ] Android Studio build and physical device tests.
 - [ ] Install and test on physical Galaxy S10e.
 
 ## 1 — Android foundation
