@@ -1,17 +1,20 @@
 # VANTA Roadmap
 
-Statuses: Implemented = coded and verified; Partial = incomplete; Planned = design-only. Do not mark done without evidence.
+Statuses: Implemented = coded and verified; Partial = incomplete; Planned = design-only; Unverified = source added but build/device test not yet demonstrated.
 
-## 0 — Handover
-- [x] Repository confirmed: midas459/VANTA-OS; empty at start.
-- [x] Master context, architecture, security, install documentation created.
-- [ ] Recover previous Android source archives; not available in current session.
-- [ ] Establish reproducible Android starter build.
-- [ ] Install and test on S10e.
+## 0 — Handover and Android foundation
+- [x] Repository confirmed: midas459/VANTA-OS.
+- [x] Master context, architecture, security and install documentation.
+- [x] Native Kotlin/Jetpack Compose application module added on `vanta/android-foundation`.
+- [x] THE VEIL initial touch UI and module selection shell added.
+- [x] Directive input capture with honest not-connected status.
+- [ ] Gradle wrapper and reproducible command-line build.
+- [ ] Android Studio build and automated tests.
+- [ ] Install and test on physical Galaxy S10e.
 
 ## 1 — Android foundation
-- [ ] Kotlin/Compose project builds.
-- [ ] THE VEIL shell/navigation.
+- [x] Initial Kotlin/Compose project structure (build unverified).
+- [x] THE VEIL shell/navigation foundation (device validation pending).
 - [ ] Real status and module screens.
 - [ ] Lifecycle, low-memory, accessibility and layout testing.
 
@@ -36,7 +39,7 @@ Statuses: Implemented = coded and verified; Partial = incomplete; Planned = desi
 - [ ] SAF-selected workspace.
 - [ ] Persist directory permissions.
 - [ ] Actual byte/quota meter.
-- [ ] Configurable 200 GB target.
+- [ ] Configurable 200 GB target (logical quota, not reserved storage or RAM).
 - [ ] ACTIVE/CACHE/VAULT/ARCHIVE/MIRROR folders.
 - [ ] Low-space reserve and safeguards.
 - [ ] Integrity/backup.
