@@ -2,49 +2,32 @@
 
 VANTA — Adaptive Intelligence Environment. Former codename: OVERMIND. Primary experience: THE VEIL.
 
-VANTA is a phone-hosted intelligence/workspace environment designed for a Samsung Galaxy S10e as the first host. It is touch-first, dark obsidian with amber accents, offline-first, mission-driven, and integrates with Android through supported APIs and explicit permissions.
+VANTA is a phone-hosted intelligence/workspace environment designed initially for a Samsung Galaxy S10e. Android remains the host operating system; VANTA does not replace Android firmware.
+
+## Android foundation (0.1.0)
+
+The first source implementation is a native Kotlin + Jetpack Compose Android application.
+
+- Application ID: `dev.vanta`
+- Minimum Android API: 26
+- Compile / target SDK: 35
+- Java toolchain target: 17
+- UI identity: obsidian surfaces, restrained amber accents, touch-first layout
+- Current screen: THE VEIL foundation with module navigation and a directive input
+
+The directive input captures input but does not yet execute missions. Module cards are navigation/status placeholders, not completed subsystems.
+
+## Build
+
+1. Install Android Studio with Android SDK Platform 35 and a JDK 17 runtime.
+2. Open this repository in Android Studio.
+3. Allow Gradle sync to complete.
+4. Run the `app` configuration on an Android emulator or connected device.
+
+A Gradle wrapper is not committed yet. Generate one from Android Studio or with Gradle 8.9 before relying on command-line builds.
 
 ## Current truth
-This repository is a reconstructed handover. Prior session ZIP/source files were not available in the current workspace, so they could not be copied byte-for-byte. Architecture and feature decisions have been reconstructed in VANTA_MASTER_CONTEXT.md. Android source/build is not yet verified here.
 
-## Identity
-- VANTA — environment
-- THE VEIL — interface
-- SENTIENT CORE — orchestration
-- DIRECTIVE — mission engine
-- MNEMOS — knowledge/memory
-- INFINITE FABRIC — resources and workspace
-- MIRROR — isolated virtual environments
-- GHOSTLINE — Android integrations
-- ORACLE — AI provider/model router
-- WARDEN — permissions and safety
-- BLACKBOX — local event log
-- RECALL — checkpoint/recovery
-- EVOLUTION — controlled module development
+This is an early Android foundation, not a complete Android OS, autonomous AI, verified VM, storage allocator, or tested APK. Physical Galaxy S10e validation and a reproducible wrapper-based build remain outstanding.
 
-## Principles
-- Free-first, offline capable. No paid API without explicit user consent.
-- Never bypass provider quotas or terms.
-- Distinguish RAM, flash, cache, workspace and virtual memory accurately.
-- No root, firmware flashing, repartitioning, or destructive installation.
-- Real implementations only; planned or simulated features must be labeled.
-- Touch-first; voice is optional and permission-based.
-
-## Repository guide
-- [VANTA_MASTER_CONTEXT.md](VANTA_MASTER_CONTEXT.md): canonical handover for future AI/devs.
-- [ROADMAP.md](ROADMAP.md): implementation stages/status.
-- [docs/FEATURE_CATALOG.md](docs/FEATURE_CATALOG.md): full intended feature inventory.
-- [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md): modules and flow.
-- [docs/INTERFACES_AND_DATA_MODEL.md](docs/INTERFACES_AND_DATA_MODEL.md): proposed contracts and data structures.
-- [docs/WORKSPACE_200GB_SPEC.md](docs/WORKSPACE_200GB_SPEC.md): logical 200 GB workspace design and safeguards.
-- [docs/MIRROR_RUNTIME_SPEC.md](docs/MIRROR_RUNTIME_SPEC.md): virtual environment feasibility and requirements.
-- [docs/ANDROID_INTEGRATION_SPEC.md](docs/ANDROID_INTEGRATION_SPEC.md): phone actions, permissions, Bixby limitations.
-- [docs/AI_HANDOVER_PROMPT.md](docs/AI_HANDOVER_PROMPT.md): ready-to-use instructions for another AI.
-- [docs/SECURITY.md](docs/SECURITY.md): permissions, policy and privacy.
-- [docs/INSTALL.md](docs/INSTALL.md): DIY build steps.
-
-## Host
-Galaxy S10e; verify model, Android version, RAM/storage variant and free storage on-device. User reports about 512 GB accessible, which may include removable storage.
-
-## Not yet complete
-This repository is not yet a complete Android OS, autonomous AI, verified VM, 200 GB storage allocator, or tested APK. See roadmap for honest status.
+See [VANTA_MASTER_CONTEXT.md](VANTA_MASTER_CONTEXT.md), [ROADMAP.md](ROADMAP.md), and [docs](docs/). No root, firmware flashing, destructive installation, paid API calls, hidden monitoring, or unchecked self-modification.
