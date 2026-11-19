@@ -173,6 +173,30 @@ private fun VantaApp() {
                     }
                 }
 
+                Card(colors = CardDefaults.cardColors(containerColor = Panel), shape = RoundedCornerShape(18.dp)) {
+                    Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                        SectionLabel("VANTA CLOUD", "SUPABASE / OPTIONAL")
+                        Text("Create a separate Supabase project for VANTA. Your existing Supabase project will not be changed.",
+                            color = White, fontSize = 12.sp, lineHeight = 18.sp)
+                        Button(
+                            onClick = {
+                                val intent = android.content.Intent(
+                                    android.content.Intent.ACTION_VIEW,
+                                    android.net.Uri.parse("https://supabase.com/dashboard/new")
+                                )
+                                context.startActivity(intent)
+                            },
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = ButtonDefaults.buttonColors(containerColor = Amber, contentColor = Obsidian),
+                            shape = RoundedCornerShape(10.dp)
+                        ) {
+                            Text("CREATE NEW SUPABASE PROJECT", fontSize = 11.sp, fontWeight = FontWeight.Black)
+                        }
+                        Text("After creation, VANTA will need the new project's Project URL and publishable key to connect. Cloud sync remains optional; local mode continues to work.",
+                            color = Muted, fontSize = 10.sp, lineHeight = 15.sp)
+                    }
+                }
+
                 Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                     SectionLabel("DIRECTIVE DECK", "01 / INPUT")
                     Card(colors = CardDefaults.cardColors(containerColor = PanelRaised), shape = RoundedCornerShape(16.dp)) {
