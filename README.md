@@ -28,7 +28,7 @@ The workflow is [Android CI](https://github.com/midas459/VANTA-OS/actions/workfl
 gradle --no-daemon testDebugUnitTest lintDebug assembleDebug
 ```
 
-A successful run uploads the `vanta-debug-apk` artifact for 14 days. Download it from the successful run's Artifacts section. This branch currently uses a provisioned Gradle distribution in CI; a Gradle wrapper is still a follow-up item for reproducible local command-line builds.
+**Verified:** [Android CI run #8 passed](https://github.com/midas459/VANTA-OS/actions/runs/44507356135) on commit `114270c`. The run passed unit tests, lint and debug APK assembly, then uploaded the `vanta-debug-apk` artifact (about 9 MB; expires 3 December 2026). Download it from the run's Artifacts section. This branch currently uses a provisioned Gradle distribution in CI; a Gradle wrapper is still a follow-up item for reproducible local command-line builds.
 
 ## Galaxy S10 installation
 
