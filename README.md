@@ -30,6 +30,14 @@ gradle --no-daemon testDebugUnitTest lintDebug assembleDebug
 
 **Verified:** [Android CI run #8 passed](https://github.com/midas459/VANTA-OS/actions/runs/44507356135) on commit `114270c`. The run passed unit tests, lint and debug APK assembly, then uploaded the `vanta-debug-apk` artifact (about 9 MB; expires 3 December 2026). Download it from the run's Artifacts section. This branch currently uses a provisioned Gradle distribution in CI; a Gradle wrapper is still a follow-up item for reproducible local command-line builds.
 
+## System shell and storage
+
+VANTA is now registered as a selectable Android Home app. Select it as the default Home app to make the Home action return to THE VEIL; One UI Home remains available as fallback. This does not replace Samsung's boot process, lock screen, kernel or firmware. Dedicated Bixby-key remapping remains firmware-dependent and unverified.
+
+INFINITE FABRIC creates an app-private workspace with a 200 GiB logical quota target, measured usage, actual internal-volume capacity display and 2 GiB safety headroom for future writes. It does not reserve 200 GiB or convert storage into RAM. The app-private directory is Android-sandboxed but is not yet a separately encrypted Knox-style vault. See [system-shell roadmap](docs/VANTA_SYSTEM_SHELL_ROADMAP.md).
+
+The CI pipeline now also launches an API 35 Android emulator and runs UI smoke tests before publishing the APK.
+
 ## Galaxy S10 installation
 
 Follow [docs/GALAXY_S10_TEST.md](docs/GALAXY_S10_TEST.md). This is an ordinary APK installation. Do not root the phone, unlock its bootloader, repartition it, or flash firmware.
