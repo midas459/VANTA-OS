@@ -1,36 +1,31 @@
 # GHOSTLINE — Android Integration Specification
 
 ## Scope
-VANTA can operate as a normal Android application. Android's security model and user permissions remain authoritative. Device control is limited to supported APIs and explicit user-granted access.
+VANTA is an Android-hosted shell. Android and Samsung One UI remain the trusted host. Integrations use supported Android APIs and explicit user permissions.
+
+## Current shell behavior
+- MainActivity is registered as both a normal launcher activity and a selectable Android Home activity.
+- The user may select VANTA as the default Home app in Android's Home app settings/chooser.
+- If selected, the Android Home action returns to THE VEIL. The user can switch back to One UI Home in Settings.
+- This does not replace the lock screen, system Settings, emergency UI, Android framework, kernel, bootloader, or Samsung firmware.
+
+## Bixby key
+The dedicated Bixby key is Samsung/OEM/firmware-controlled. A normal app cannot guarantee interception of its hardware event. Investigate supported remapping for the exact Galaxy S10 firmware and offer a visible launcher/shortcut fallback. Do not use hidden accessibility capture, key injection, root, or bypasses. Do not claim Bixby key support until verified on-device.
 
 ## Supported integration candidates
 - Launch apps through resolved intents.
 - Open Android Settings screens through supported intents.
 - SAF folder/file selection and access.
 - Share sheets and user-confirmed exports.
-- Speech input and output where supported.
-- Camera/mic/sensors only when the user activates feature and grants permission.
+- Speech input/output only when activated and permissioned.
 - Battery, connectivity, memory and storage status through supported APIs.
-- Optional notification integration only with clear disclosure and user-granted Notification Listener access.
-
-## Bixby key
-- Hardware-key behavior is OEM/firmware-dependent.
-- Investigate Samsung's available settings and third-party remapping compatibility for the exact firmware.
-- Prefer supported app shortcuts/launcher affordances as fallback.
-- Never promise the app can intercept the button unconditionally.
-- No root, key injection, firmware modifications, or bypasses.
+- Optional notification integration only with clear disclosure and explicit Notification Listener consent.
 
 ## Action registry
-Every action describes: ID, label, capability, intent/parameters, permission needs, preflight result, risk class, confirmation requirement, result/error, audit event. Unsupported actions must show unavailable, not fake success.
+Every action declares ID, label, capability, intent/parameters, permission needs, preflight result, risk class, confirmation requirement, result/error, and audit event. Unsupported actions show unavailable rather than fake success.
 
-## Accessibility
-If an accessibility integration is considered:
-- Explain its scope and purpose.
-- User enables it manually in Android settings.
-- Restrict it to documented workflows.
-- Provide immediate disable path.
-- Never silently collect screens or monitor user activity.
-- No hidden remote-control behavior.
+## Accessibility and background work
+Accessibility must be optional, narrowly scoped, user-enabled, disclosed and immediately disableable. Never silently collect screens or monitor activity. Background work respects Doze, battery limits and cancellation; use foreground service only when necessary with visible notification.
 
-## Background work
-Use Android-supported background scheduling. Respect Doze, battery and task limits. Foreground service only when task genuinely requires it and disclosure/notification are provided. Work can be interrupted and must checkpoint safely.
+## Boot sequence
+VANTA can show its own startup sequence after Android launches the selected Home activity. It cannot replace Samsung's pre-unlock boot animation or boot process without privileged firmware modification. Firmware modification is out of scope for the safe S10 development path.
