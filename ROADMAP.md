@@ -8,15 +8,15 @@ Statuses: Implemented = coded and verified; Partial = incomplete; Planned = desi
 - [x] Native Kotlin/Jetpack Compose application module added on `vanta/android-foundation`.
 - [x] THE VEIL initial touch UI and module selection shell added.
 - [x] Directive input capture with honest not-connected status.
-- [ ] Gradle wrapper and reproducible command-line build.
-- [ ] Android Studio build and automated tests.
+- [ ] Gradle wrapper and reproducible local command-line build.\n- [x] GitHub Actions CI workflow configured for Android build, lint, unit tests and APK artifact.\n- [x] Deterministic offline DIRECTIVE parser and local task/note persistence added.\n- [x] Galaxy S10 installation and manual test guide added.
+- [ ] CI build, lint and unit tests pass (workflow configured; result pending).\n- [ ] Android Studio build and physical device tests.
 - [ ] Install and test on physical Galaxy S10e.
 
 ## 1 — Android foundation
-- [x] Initial Kotlin/Compose project structure (build unverified).
+- [x] Kotlin/Compose project structure (build still unverified until CI completes).
 - [x] THE VEIL shell/navigation foundation (device validation pending).
-- [ ] Real status and module screens.
-- [ ] Lifecycle, low-memory, accessibility and layout testing.
+- [x] Initial status and module detail screens with implemented/planned capability labels.
+- [ ] Lifecycle, low-memory, accessibility and Galaxy S10 layout testing.
 
 ## 2 — Persistence
 - [ ] Database schema and migrations.
