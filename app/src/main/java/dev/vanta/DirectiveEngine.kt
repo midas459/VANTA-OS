@@ -10,6 +10,10 @@ object DirectiveEngine {
         data object Status : Action
         data class AddTask(val title: String) : Action
         data class AddNote(val text: String) : Action
+        data class CompleteTask(val title: String) : Action
+        data class DeleteTask(val title: String) : Action
+        data class DeleteNote(val text: String) : Action
+        data class SearchNotes(val query: String) : Action
         data object ListTasks : Action
         data class Unknown(val input: String) : Action
         data object Empty : Action
@@ -27,10 +31,18 @@ object DirectiveEngine {
         return when (command) {
             "help" -> Result(
                 Action.Help,
-                "Commands: help · status · task <title> · note <text> · list"
+                "Commands: help · status · task <title> · note <text> · list · complete <title> · delete-task <title> · delete-note <title> · search-note <text>"
             )
             "status" -> Result(Action.Status, "VANTA core is local and responsive. No external actions are enabled.")
             "list" -> Result(Action.ListTasks, "Opening your local task list.")
+            "complete" -> if (argument.isBlank()) Result(Action.Unknown(input), "Specify a task title to complete.")
+                else Result(Action.CompleteTask(argument), "Task completion requested: $argument")
+            "delete-task" -> if (argument.isBlank()) Result(Action.Unknown(input), "Specify a task title to delete.")
+                else Result(Action.DeleteTask(argument), "Task deletion requested: $argument")
+            "delete-note" -> if (argument.isBlank()) Result(Action.Unknown(input), "Specify a note title or text to delete.")
+                else Result(Action.DeleteNote(argument), "Note deletion requested: $argument")
+            "search-note" -> if (argument.isBlank()) Result(Action.Unknown(input), "Specify a search query.")
+                else Result(Action.SearchNotes(argument), "Searching local notes: $argument")
             "task" -> if (argument.isBlank()) {
                 Result(Action.Unknown(input), "A task needs a title. Try: task Prepare physics notes")
             } else {
