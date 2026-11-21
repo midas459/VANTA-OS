@@ -45,8 +45,6 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.json.JSONArray
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 
 private val Obsidian = Color(0xFF080A0D)
 private val Panel = Color(0xFF131820)
@@ -93,14 +91,6 @@ private fun VantaApp() {
     var feedback by remember { mutableStateOf("Ready. Type help to see what VANTA can do offline.") }
     var activeModule by remember { mutableStateOf("OVERVIEW") }
     var showAllTasks by remember { mutableStateOf(false) }
-    var workspaceSnapshot by remember { mutableStateOf<WorkspaceSnapshot?>(null) }
-
-    LaunchedEffect(activeModule) {
-        if (activeModule == "FABRIC") {
-            workspaceSnapshot = withContext(Dispatchers.IO) { WorkspaceStorage.snapshot(context) }
-        }
-    }
-
     fun persist(key: String, values: List<String>) {
         val json = JSONArray()
         values.forEach { json.put(it) }
