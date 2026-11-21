@@ -44,6 +44,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kotlinx.coroutines.delay
 import org.json.JSONArray
 
 private val Obsidian = Color(0xFF080A0D)
@@ -100,6 +101,8 @@ private fun VantaApp() {
     var feedback by remember { mutableStateOf("Ready. Type help to see what VANTA can do offline.") }
     var activeModule by remember { mutableStateOf("OVERVIEW") }
     var showAllTasks by remember { mutableStateOf(false) }
+    var showBoot by remember { mutableStateOf(true) }
+    LaunchedEffect(Unit) { delay(1100); showBoot = false }
     fun persist(key: String, values: List<String>) {
         val json = JSONArray()
         values.forEach { json.put(it) }
@@ -180,11 +183,23 @@ private fun VantaApp() {
         "FABRIC" to ("WORKSPACE" to "Browse, create, preview and delete files in VANTA's app-private workspace. Writes respect device free space and a logical quota."),
         "MIRROR" to ("ISOLATED WORKBENCH" to "Runtime isolation is still under research. VANTA does not claim to provide a virtual machine yet."),
         "GHOSTLINE" to ("ANDROID BRIDGE" to "Native app and settings integrations will use explicit Android intents and permission prompts."),
-        "ORACLE" to ("INTELLIGENCE ROUTER" to "Offline commands work now. Model providers and network access are not connected.")
+        "ORACLE" to ("INTELLIGENCE ROUTER" to "Offline commands work now. Model providers and network access are not connected."),
+        "WARDEN" to ("PERMISSION & SAFETY GATE" to "Review Android permissions and open the app permission controls. VANTA never silently grants permissions.")
     )
 
     MaterialTheme {
         Surface(modifier = Modifier.fillMaxSize(), color = Obsidian) {
+            if (showBoot) {
+                Column(Modifier.fillMaxSize().padding(28.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
+                    Text("V A N T A", color = Amber, fontSize = 16.sp, fontWeight = FontWeight.Black, letterSpacing = 5.sp)
+                    Spacer(Modifier.height(18.dp))
+                    Text("INITIALIZING", color = White, fontSize = 24.sp, fontWeight = FontWeight.Light, letterSpacing = 2.sp)
+                    Spacer(Modifier.height(10.dp))
+                    Text("THE VEIL  /  LOCAL CORE", color = Muted, fontSize = 10.sp, letterSpacing = 1.5.sp)
+                    Spacer(Modifier.height(26.dp))
+                    Text("ANDROID HOST PRESERVED", color = Green, fontSize = 9.sp, fontWeight = FontWeight.Bold)
+                }
+            } else {
             Column(
                 modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState())
                     .imePadding().padding(horizontal = 20.dp, vertical = 22.dp),
@@ -259,7 +274,7 @@ private fun VantaApp() {
 
                 Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                     SectionLabel("SYSTEM MODULES", "02 / NAVIGATION")
-                    val modules = listOf("DIRECTIVE", "MNEMOS", "FABRIC", "MIRROR", "GHOSTLINE", "ORACLE")
+                    val modules = listOf("DIRECTIVE", "MNEMOS", "FABRIC", "MIRROR", "GHOSTLINE", "ORACLE", "WARDEN")
                     modules.chunked(2).forEach { pair ->
                         Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                             pair.forEach { module ->
@@ -379,6 +394,8 @@ private fun VantaApp() {
                             if (activeModule == "FABRIC") {
                                 FabricPanel(context) { feedback = it }
                             }
+                            if (activeModule == "GHOSTLINE") GhostlinePanel(context)
+                            if (activeModule == "WARDEN") WardenPanel(context)
                         }
                     }
                 } else {
@@ -396,6 +413,7 @@ private fun VantaApp() {
                 Spacer(Modifier.height(4.dp))
                 Text("VANTA 0.2.0  ·  DEVICE TEST BUILD  ·  ANDROID HOST PRESERVED",
                     color = Muted, fontSize = 9.sp, modifier = Modifier.align(Alignment.CenterHorizontally))
+            }
             }
         }
     }
