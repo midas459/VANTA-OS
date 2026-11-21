@@ -181,9 +181,9 @@ private fun VantaApp() {
         "DIRECTIVE" to ("LOCAL COMMANDS" to "Capture tasks and notes with a deterministic offline parser. No remote AI or hidden actions."),
         "MNEMOS" to ("DEVICE MEMORY" to "Your notes are stored in app-private local storage. Export, search and encryption are future milestones."),
         "FABRIC" to ("WORKSPACE" to "Browse, create, preview and delete files in VANTA's app-private workspace. Writes respect device free space and a logical quota."),
-        "MIRROR" to ("ISOLATED WORKBENCH" to "Runtime isolation is still under research. VANTA does not claim to provide a virtual machine yet."),
+        "MIRROR" to ("WORKSPACE PROFILES" to "Create and manage app-private experiment folders. This is not a guest OS or virtual machine."),
         "GHOSTLINE" to ("ANDROID BRIDGE" to "Native app and settings integrations will use explicit Android intents and permission prompts."),
-        "ORACLE" to ("INTELLIGENCE ROUTER" to "Offline commands work now. Model providers and network access are not connected."),
+        "ORACLE" to ("OFFLINE ROUTER" to "Route supported offline commands to DIRECTIVE. No remote AI provider is configured."),
         "WARDEN" to ("PERMISSION & SAFETY GATE" to "Review Android permissions and open the app permission controls. VANTA never silently grants permissions.")
     )
 
@@ -212,7 +212,7 @@ private fun VantaApp() {
                         Text("ADAPTIVE INTELLIGENCE ENVIRONMENT", color = Muted, fontSize = 9.sp, letterSpacing = 1.2.sp)
                     }
                     Column(horizontalAlignment = Alignment.End) {
-                        Text("● ONLINE", color = Green, fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                        Text("● LOCAL READY", color = Green, fontSize = 10.sp, fontWeight = FontWeight.Bold)
                         Text("LOCAL CORE", color = Muted, fontSize = 9.sp)
                     }
                 }
@@ -291,8 +291,13 @@ private fun VantaApp() {
                                     Column(Modifier.fillMaxWidth().padding(14.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
                                         Text(module, color = if (selected) Amber else White, fontSize = 11.sp, fontWeight = FontWeight.Bold)
                                         Text(moduleInfo.getValue(module).first, color = Muted, fontSize = 9.sp)
-                                        Text(if (module == "DIRECTIVE" || module == "MNEMOS" || module == "FABRIC") "LOCAL FOUNDATION" else "IN DEVELOPMENT",
-                                            color = if (module == "DIRECTIVE" || module == "MNEMOS") Green else Muted,
+                                        Text(when (module) {
+                                                "DIRECTIVE", "MNEMOS", "FABRIC", "GHOSTLINE", "WARDEN" -> "LOCAL FOUNDATION"
+                                                "MIRROR" -> "WORKSPACE ONLY · NOT A VM"
+                                                "ORACLE" -> "OFFLINE ROUTING · NOT AI"
+                                                else -> "IN DEVELOPMENT"
+                                            },
+                                            color = if (module in listOf("DIRECTIVE", "MNEMOS", "FABRIC", "GHOSTLINE", "WARDEN")) Green else Muted,
                                             fontSize = 8.sp, fontWeight = FontWeight.Bold)
                                     }
                                 }
@@ -396,6 +401,14 @@ private fun VantaApp() {
                             }
                             if (activeModule == "GHOSTLINE") GhostlinePanel(context)
                             if (activeModule == "WARDEN") WardenPanel(context)
+                            if (activeModule == "MIRROR") MirrorPanel(context)
+                            if (activeModule == "ORACLE") OraclePanel { routedCommand ->
+                                command = routedCommand
+                                activeModule = "DIRECTIVE"
+                                showAllTasks = true
+                                feedback = "ORACLE routed the request to DIRECTIVE. Review it before processing."
+                                status = "DIRECTIVE READY · USER ACTION REQUIRED"
+                            }
                         }
                     }
                 } else {
