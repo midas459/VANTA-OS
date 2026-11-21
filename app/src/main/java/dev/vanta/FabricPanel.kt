@@ -12,6 +12,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -47,6 +49,7 @@ fun FabricPanel(context: Context, onFeedback: (String) -> Unit) {
     var draft by remember { mutableStateOf("") }
     var openedPath by remember { mutableStateOf<String?>(null) }
     var openedContents by remember { mutableStateOf<String?>(null) }
+    var pendingDelete by remember { mutableStateOf<WorkspaceEntry?>(null) }
     var refresh by remember { mutableStateOf(0) }
     val scope = rememberCoroutineScope()
 
@@ -143,12 +146,7 @@ fun FabricPanel(context: Context, onFeedback: (String) -> Unit) {
                         color = FabricMuted, fontSize = 9.sp)
                 }
                 Text("DELETE", color = FabricMuted, fontSize = 8.sp, modifier = Modifier.clickable {
-                    scope.launch {
-                        val result = withContext(Dispatchers.IO) { WorkspaceStorage.delete(context, entry.relativePath) }
-                        onFeedback(result.message)
-                        if (openedPath == entry.relativePath) { openedPath = null; openedContents = null }
-                        refresh++
-                    }
+                    pendingDelete = entry
                 }.padding(6.dp))
             }
         }
@@ -160,5 +158,26 @@ fun FabricPanel(context: Context, onFeedback: (String) -> Unit) {
         }
         Text("200 GiB is a logical ceiling, not preallocated space. Files remain in Android's app-private sandbox. Writes check real free space and the safety reserve.",
             color = FabricMuted, fontSize = 10.sp, lineHeight = 15.sp)
+    }
+    pendingDelete?.let { entry ->
+        AlertDialog(
+            onDismissRequest = { pendingDelete = null },
+            title = { Text("Delete workspace item?") },
+            text = { Text("Permanently delete '" + entry.name + "' and its contents if it is a folder?") },
+            confirmButton = {
+                TextButton(onClick = {
+                    scope.launch {
+                        val result = withContext(Dispatchers.IO) {
+                            WorkspaceStorage.delete(context, entry.relativePath)
+                        }
+                        onFeedback(result.message)
+                        if (openedPath == entry.relativePath) { openedPath = null; openedContents = null }
+                        pendingDelete = null
+                        refresh++
+                    }
+                }) { Text("DELETE") }
+            },
+            dismissButton = { TextButton(onClick = { pendingDelete = null }) { Text("CANCEL") } }
+        )
     }
 }
