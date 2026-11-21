@@ -363,27 +363,7 @@ private fun VantaApp() {
                                 else if (filteredNotes.isEmpty()) Text("No notes match this search.", color = Muted, fontSize = 11.sp)
                             }
                             if (activeModule == "FABRIC") {
-                                Text("INFINITE FABRIC · PRIVATE WORKSPACE", color = Amber,
-                                    fontSize = 10.sp, fontWeight = FontWeight.Bold)
-                                val snapshot = workspaceSnapshot
-                                if (snapshot == null) {
-                                    Text("Measuring this device's app-private workspace…", color = Muted, fontSize = 11.sp)
-                                } else {
-                                    Text("TARGET QUOTA   200 GiB", color = White, fontSize = 13.sp,
-                                        fontWeight = FontWeight.Bold)
-                                    Text("USED   ${snapshot.usedBytes / WorkspaceQuota.GIB} GiB  ·  ${snapshot.quotaPercent}% of target",
-                                        color = White, fontSize = 11.sp)
-                                    Text("INTERNAL VOLUME FREE   ${snapshot.freeBytesOnInternalVolume / WorkspaceQuota.GIB} GiB",
-                                        color = White, fontSize = 11.sp)
-                                    Text("DEVICE VOLUME   ${snapshot.totalBytesOnInternalVolume / WorkspaceQuota.GIB} GiB total",
-                                        color = Muted, fontSize = 10.sp)
-                                    Text("SAFE HEADROOM   2 GiB reserved from VANTA writes",
-                                        color = Muted, fontSize = 10.sp)
-                                    Text("Private path: app sandbox / vanta-fabric",
-                                        color = Muted, fontSize = 10.sp)
-                                }
-                                Text("200 GiB is a logical ceiling, not preallocated space. Writes must pass both quota and real free-space checks. Android remains in control of storage.",
-                                    color = Muted, fontSize = 10.sp, lineHeight = 15.sp)
+                                FabricPanel(context) { feedback = it }
                             }
                         }
                     }
