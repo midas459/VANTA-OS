@@ -72,4 +72,44 @@ class VantaHomeShellTest {
         composeRule.onNodeWithText("PROCESS DIRECTIVE").assertExists()
     }
 
+    @Test
+    fun directiveTaskDeleteRequiresConfirmation() {
+        waitForHome()
+        composeRule.onNodeWithText("Try: task Build the VANTA core").performTextInput("task QA task")
+        composeRule.onNodeWithText("PROCESS DIRECTIVE").performClick()
+        composeRule.onNodeWithText("DIRECTIVE").performClick()
+        composeRule.onNodeWithText("QA task").assertExists()
+        composeRule.onNodeWithText("DELETE").performClick()
+        composeRule.onNodeWithText("Delete task?").assertExists()
+        composeRule.onNodeWithText("CANCEL").performClick()
+        composeRule.onNodeWithText("QA task").assertExists()
+    }
+
+    @Test
+    fun mnemosSavesNoteAndRequiresDeleteConfirmation() {
+        waitForHome()
+        composeRule.onNodeWithText("MNEMOS").performClick()
+        composeRule.onNodeWithText("Write a note or edit a selected note…").performTextInput("VANTA test note")
+        composeRule.onNodeWithText("SAVE NOTE").performClick()
+        composeRule.onNodeWithText("VANTA test note").assertExists()
+        composeRule.onNodeWithText("DELETE").performClick()
+        composeRule.onNodeWithText("Delete note?").assertExists()
+        composeRule.onNodeWithText("CANCEL").performClick()
+        composeRule.onNodeWithText("VANTA test note").assertExists()
+    }
+
+    @Test
+    fun fabricFolderCreationAndDeleteConfirmationWork() {
+        waitForHome()
+        composeRule.onNodeWithText("FABRIC").performClick()
+        composeRule.onNodeWithText("New folder or file name").performTextInput("Folder QA")
+        composeRule.onNodeWithText("NEW FOLDER").performClick()
+        composeRule.waitUntil(5_000) {
+            composeRule.onAllNodesWithText("FOLDER  Folder QA").fetchSemanticsNodes().isNotEmpty()
+        }
+        composeRule.onNodeWithText("DELETE").performClick()
+        composeRule.onNodeWithText("Delete workspace item?").assertExists()
+        composeRule.onNodeWithText("CANCEL").performClick()
+    }
+
 }
