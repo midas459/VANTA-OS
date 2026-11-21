@@ -27,6 +27,24 @@ class DirectiveEngineTest {
         assertTrue(DirectiveEngine.parse("delete everything").action is DirectiveEngine.Action.Unknown)
     }
 
+    @Test fun parsesTaskLifecycleAndNoteSearchCommands() {
+        assertEquals(DirectiveEngine.Action.CompleteTask("Study physics"),
+            DirectiveEngine.parse("complete Study physics").action)
+        assertEquals(DirectiveEngine.Action.DeleteTask("Study physics"),
+            DirectiveEngine.parse("delete-task Study physics").action)
+        assertEquals(DirectiveEngine.Action.DeleteNote("Optics"),
+            DirectiveEngine.parse("delete-note Optics").action)
+        assertEquals(DirectiveEngine.Action.SearchNotes("lens"),
+            DirectiveEngine.parse("search-note lens").action)
+    }
+
+    @Test fun lifecycleCommandsRejectMissingArguments() {
+        assertTrue(DirectiveEngine.parse("complete").action is DirectiveEngine.Action.Unknown)
+        assertTrue(DirectiveEngine.parse("delete-task").action is DirectiveEngine.Action.Unknown)
+        assertTrue(DirectiveEngine.parse("delete-note").action is DirectiveEngine.Action.Unknown)
+        assertTrue(DirectiveEngine.parse("search-note").action is DirectiveEngine.Action.Unknown)
+    }
+
     @Test fun blankInputIsSafe() {
         assertTrue(DirectiveEngine.parse("   ").action is DirectiveEngine.Action.Empty)
     }
