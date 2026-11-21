@@ -93,12 +93,15 @@ object SupabaseProjectStore {
 }
 
 object VantaSupabaseRuntime {
-    fun create(config: SupabaseProjectConfig): SupabaseClient =
+    fun create(context: Context, config: SupabaseProjectConfig): SupabaseClient =
         createSupabaseClient(config.url, config.publishableKey) {
             install(Auth) {
                 host = "auth"
                 scheme = "vanta"
                 flowType = FlowType.PKCE
+                sessionManager = io.github.jan.supabase.auth.SettingsSessionManager(
+                    key = "vanta-session-${config.url.hashCode()}"
+                )
             }
         }
 
@@ -107,7 +110,7 @@ object VantaSupabaseRuntime {
         val projects = SupabaseProjectStore.load(context)
         val index = SupabaseProjectStore.activeIndex(context, projects.size)
         val config = projects.getOrNull(index) ?: return
-        runCatching { create(config).handleDeeplinks(intent) }
+        runCatching { create(context, config).handleDeeplinks(intent) }
     }
 }
 
@@ -129,7 +132,7 @@ fun SupabasePanel(context: Context) {
     val scope = rememberCoroutineScope()
     val activeProject = projects.getOrNull(activeIndex)
     val client = remember(activeProject?.url, activeProject?.publishableKey) {
-        activeProject?.let { VantaSupabaseRuntime.create(it) }
+        activeProject?.let { VantaSupabaseRuntime.create(context, it) }
     }
 
     LaunchedEffect(client) {
