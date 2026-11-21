@@ -23,6 +23,8 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
@@ -102,6 +104,8 @@ private fun VantaApp() {
     var activeModule by remember { mutableStateOf("OVERVIEW") }
     var showAllTasks by remember { mutableStateOf(false) }
     var showBoot by remember { mutableStateOf(true) }
+    var pendingTaskDelete by remember { mutableStateOf<String?>(null) }
+    var pendingNoteDelete by remember { mutableStateOf<String?>(null) }
     LaunchedEffect(Unit) { delay(1100); showBoot = false }
     fun persist(key: String, values: List<String>) {
         val json = JSONArray()
@@ -331,8 +335,7 @@ private fun VantaApp() {
                                                 persist("completedTasks", completedTasks)
                                             }.padding(5.dp))
                                         Text("DELETE", color = Muted, fontSize = 8.sp, modifier = Modifier.clickable {
-                                            tasks.remove(task); completedTasks.removeAll { it.equals(task, ignoreCase = true) }
-                                            persist("tasks", tasks); persist("completedTasks", completedTasks)
+                                            pendingTaskDelete = task
                                         }.padding(5.dp))
                                     }
                                 }
@@ -388,8 +391,7 @@ private fun VantaApp() {
                                             noteDraft = note
                                         }.padding(5.dp))
                                         Text("DELETE", color = Muted, fontSize = 8.sp, modifier = Modifier.clickable {
-                                            notes.remove(note); persist("notes", notes)
-                                            if (editingNote == note) { editingNote = null; noteDraft = "" }
+                                            pendingNoteDelete = note
                                         }.padding(5.dp))
                                     }
                                 }
@@ -428,6 +430,41 @@ private fun VantaApp() {
                     color = Muted, fontSize = 9.sp, modifier = Modifier.align(Alignment.CenterHorizontally))
             }
             }
+        }
+        pendingTaskDelete?.let { task ->
+            AlertDialog(
+                onDismissRequest = { pendingTaskDelete = null },
+                title = { Text("Delete task?") },
+                text = { Text("This removes '$task' from your local task list.") },
+                confirmButton = {
+                    TextButton(onClick = {
+                        tasks.remove(task)
+                        completedTasks.removeAll { it.equals(task, ignoreCase = true) }
+                        persist("tasks", tasks)
+                        persist("completedTasks", completedTasks)
+                        pendingTaskDelete = null
+                        feedback = "Task deleted locally."
+                    }) { Text("DELETE") }
+                },
+                dismissButton = { TextButton(onClick = { pendingTaskDelete = null }) { Text("CANCEL") } }
+            )
+        }
+        pendingNoteDelete?.let { note ->
+            AlertDialog(
+                onDismissRequest = { pendingNoteDelete = null },
+                title = { Text("Delete note?") },
+                text = { Text("This permanently removes the selected local note.") },
+                confirmButton = {
+                    TextButton(onClick = {
+                        notes.remove(note)
+                        persist("notes", notes)
+                        if (editingNote == note) { editingNote = null; noteDraft = "" }
+                        pendingNoteDelete = null
+                        feedback = "Note deleted locally."
+                    }) { Text("DELETE") }
+                },
+                dismissButton = { TextButton(onClick = { pendingNoteDelete = null }) { Text("CANCEL") } }
+            )
         }
     }
 }
