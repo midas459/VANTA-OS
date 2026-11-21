@@ -82,6 +82,13 @@ private fun VantaApp() {
         }
     }
     var command by remember { mutableStateOf("") }
+    var noteSearch by remember { mutableStateOf("") }
+    val completedTasks = remember {
+        mutableStateListOf<String>().apply {
+            val saved = JSONArray(preferences.getString("completedTasks", "[]"))
+            for (index in 0 until saved.length()) add(saved.optString(index))
+        }
+    }
     var status by remember { mutableStateOf("ALL SYSTEMS NOMINAL · LOCAL MODE") }
     var feedback by remember { mutableStateOf("Ready. Type help to see what VANTA can do offline.") }
     var activeModule by remember { mutableStateOf("OVERVIEW") }
@@ -119,9 +126,14 @@ private fun VantaApp() {
                 if (task == null) {
                     feedback = "Task not found: ${action.title}"
                     status = "NO MATCH · NOTHING CHANGED"
+                } else if (completedTasks.any { it.equals(task, ignoreCase = true) }) {
+                    feedback = "Already completed: $task"
+                    status = "TASK ALREADY COMPLETE"
                 } else {
-                    feedback = "Completed: $task (completion tracking is pending UI integration)"
-                    status = "TASK FOUND · COMPLETION NOT PERSISTED"
+                    completedTasks.add(task)
+                    persist("completedTasks", completedTasks)
+                    feedback = "Completed: $task"
+                    status = "COMPLETION SAVED · ON THIS DEVICE"
                 }
             }
             is DirectiveEngine.Action.DeleteTask -> {
@@ -145,9 +157,10 @@ private fun VantaApp() {
                 }
             }
             is DirectiveEngine.Action.SearchNotes -> {
+                noteSearch = action.query
                 activeModule = "MNEMOS"
-                feedback = "Search requested: ${action.query} (search UI integration pending)"
-                status = "NOTE SEARCH REQUESTED"
+                feedback = "Searching local notes: ${action.query}"
+                status = "LOCAL NOTE SEARCH"
             }
             DirectiveEngine.Action.ListTasks -> {
                 showAllTasks = true
@@ -309,14 +322,45 @@ private fun VantaApp() {
                                 if (visibleTasks.isEmpty()) Text("No tasks stored yet. Try: task Your first mission",
                                     color = Muted, fontSize = 11.sp)
                                 visibleTasks.forEachIndexed { index, task ->
-                                    Text("${index + 1}.  $task", color = White, fontSize = 11.sp)
+                                    Row(verticalAlignment = Alignment.CenterVertically,
+                                        horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
+                                        Text("${index + 1}.  $task", color = if (completedTasks.any { it.equals(task, ignoreCase = true) }) Green else White,
+                                            fontSize = 11.sp, modifier = Modifier.weight(1f))
+                                        Text(if (completedTasks.any { it.equals(task, ignoreCase = true) }) "DONE" else "COMPLETE",
+                                            color = Green, fontSize = 8.sp, fontWeight = FontWeight.Bold,
+                                            modifier = Modifier.clickable {
+                                                if (completedTasks.any { it.equals(task, ignoreCase = true) }) completedTasks.removeAll { it.equals(task, ignoreCase = true) }
+                                                else completedTasks.add(task)
+                                                persist("completedTasks", completedTasks)
+                                            }.padding(5.dp))
+                                        Text("DELETE", color = Muted, fontSize = 8.sp, modifier = Modifier.clickable {
+                                            tasks.remove(task); completedTasks.removeAll { it.equals(task, ignoreCase = true) }
+                                            persist("tasks", tasks); persist("completedTasks", completedTasks)
+                                        }.padding(5.dp))
+                                    }
                                 }
                             }
                             if (activeModule == "MNEMOS") {
-                                Text("RECENT NOTES", color = Amber, fontSize = 10.sp, fontWeight = FontWeight.Bold)
-                                notes.take(4).forEach { Text("•  $it", color = White, fontSize = 11.sp) }
-                                if (notes.isEmpty()) Text("No notes stored yet. Try: note Your first memory",
-                                    color = Muted, fontSize = 11.sp)
+                                Text("NOTE SEARCH", color = Amber, fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                                BasicTextField(value = noteSearch, onValueChange = { noteSearch = it },
+                                    modifier = Modifier.fillMaxWidth().background(Obsidian, RoundedCornerShape(8.dp)).padding(10.dp),
+                                    singleLine = true, textStyle = TextStyle(color = White, fontSize = 12.sp),
+                                    decorationBox = { inner ->
+                                        if (noteSearch.isEmpty()) Text("Search saved notes…", color = Muted, fontSize = 12.sp)
+                                        inner()
+                                    })
+                                val filteredNotes = notes.filter { it.contains(noteSearch, ignoreCase = true) }
+                                Text("MATCHING NOTES · ${filteredNotes.size}", color = Amber, fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                                filteredNotes.take(10).forEach { note ->
+                                    Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
+                                        Text("•  $note", color = White, fontSize = 11.sp, modifier = Modifier.weight(1f))
+                                        Text("DELETE", color = Muted, fontSize = 8.sp, modifier = Modifier.clickable {
+                                            notes.remove(note); persist("notes", notes)
+                                        }.padding(5.dp))
+                                    }
+                                }
+                                if (notes.isEmpty()) Text("No notes stored yet. Try: note Your first memory", color = Muted, fontSize = 11.sp)
+                                else if (filteredNotes.isEmpty()) Text("No notes match this search.", color = Muted, fontSize = 11.sp)
                             }
                             if (activeModule == "FABRIC") {
                                 Text("INFINITE FABRIC · PRIVATE WORKSPACE", color = Amber,
