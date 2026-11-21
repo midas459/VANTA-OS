@@ -114,6 +114,41 @@ private fun VantaApp() {
                 persist("notes", notes)
                 status = "NOTE STORED · ON THIS DEVICE"
             }
+            is DirectiveEngine.Action.CompleteTask -> {
+                val task = tasks.firstOrNull { it.equals(action.title, ignoreCase = true) }
+                if (task == null) {
+                    feedback = "Task not found: ${action.title}"
+                    status = "NO MATCH · NOTHING CHANGED"
+                } else {
+                    feedback = "Completed: $task (completion tracking is pending UI integration)"
+                    status = "TASK FOUND · COMPLETION NOT PERSISTED"
+                }
+            }
+            is DirectiveEngine.Action.DeleteTask -> {
+                val task = tasks.firstOrNull { it.equals(action.title, ignoreCase = true) }
+                if (task == null) feedback = "Task not found: ${action.title}"
+                else {
+                    tasks.remove(task)
+                    persist("tasks", tasks)
+                    feedback = "Deleted task: $task"
+                    status = "TASK DELETED · ON THIS DEVICE"
+                }
+            }
+            is DirectiveEngine.Action.DeleteNote -> {
+                val note = notes.firstOrNull { it.equals(action.text, ignoreCase = true) }
+                if (note == null) feedback = "Note not found: ${action.text}"
+                else {
+                    notes.remove(note)
+                    persist("notes", notes)
+                    feedback = "Deleted note."
+                    status = "NOTE DELETED · ON THIS DEVICE"
+                }
+            }
+            is DirectiveEngine.Action.SearchNotes -> {
+                activeModule = "MNEMOS"
+                feedback = "Search requested: ${action.query} (search UI integration pending)"
+                status = "NOTE SEARCH REQUESTED"
+            }
             DirectiveEngine.Action.ListTasks -> {
                 showAllTasks = true
                 activeModule = "DIRECTIVE"
