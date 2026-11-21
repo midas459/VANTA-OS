@@ -168,7 +168,7 @@ private fun VantaApp() {
     val moduleInfo = mapOf(
         "DIRECTIVE" to ("LOCAL COMMANDS" to "Capture tasks and notes with a deterministic offline parser. No remote AI or hidden actions."),
         "MNEMOS" to ("DEVICE MEMORY" to "Your notes are stored in app-private local storage. Export, search and encryption are future milestones."),
-        "FABRIC" to ("WORKSPACE" to "A safe workspace browser using Android's document picker is planned. No storage is reserved today."),
+        "FABRIC" to ("WORKSPACE" to "Browse, create, preview and delete files in VANTA's app-private workspace. Writes respect device free space and a logical quota."),
         "MIRROR" to ("ISOLATED WORKBENCH" to "Runtime isolation is still under research. VANTA does not claim to provide a virtual machine yet."),
         "GHOSTLINE" to ("ANDROID BRIDGE" to "Native app and settings integrations will use explicit Android intents and permission prompts."),
         "ORACLE" to ("INTELLIGENCE ROUTER" to "Offline commands work now. Model providers and network access are not connected.")
@@ -289,7 +289,7 @@ private fun VantaApp() {
                                     Column(Modifier.fillMaxWidth().padding(14.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
                                         Text(module, color = if (selected) Amber else White, fontSize = 11.sp, fontWeight = FontWeight.Bold)
                                         Text(moduleInfo.getValue(module).first, color = Muted, fontSize = 9.sp)
-                                        Text(if (module == "DIRECTIVE" || module == "MNEMOS") "LOCAL FOUNDATION" else "IN DEVELOPMENT",
+                                        Text(if (module == "DIRECTIVE" || module == "MNEMOS" || module == "FABRIC") "LOCAL FOUNDATION" else "IN DEVELOPMENT",
                                             color = if (module == "DIRECTIVE" || module == "MNEMOS") Green else Muted,
                                             fontSize = 8.sp, fontWeight = FontWeight.Bold)
                                     }
@@ -361,9 +361,9 @@ private fun VantaApp() {
                     Card(colors = CardDefaults.cardColors(containerColor = Panel), shape = RoundedCornerShape(14.dp)) {
                         Column(Modifier.fillMaxWidth().padding(15.dp), verticalArrangement = Arrangement.spacedBy(7.dp)) {
                             SectionLabel("CURRENT CAPABILITIES", "03 / HONEST STATUS")
-                            Text("ACTIVE  ·  Offline directive parser, local task capture, local notes, on-device persistence.",
+                            Text("ACTIVE  ·  Offline directives, persistent tasks, searchable notes and the private Fabric file workspace.",
                                 color = White, fontSize = 11.sp, lineHeight = 17.sp)
-                            Text("NOT CONNECTED  ·  AI providers, app automation, virtual machine, cloud sync and 200 GB workspace.",
+                            Text("NOT CONNECTED  ·  AI providers, app automation, virtual machine and cloud sync. The 200 GiB Fabric limit is logical, not preallocated.",
                                 color = Muted, fontSize = 11.sp, lineHeight = 17.sp)
                         }
                     }
