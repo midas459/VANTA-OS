@@ -3,6 +3,7 @@ package dev.vanta
 import androidx.compose.ui.test.assertExists
 import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performTextInput
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -49,4 +50,26 @@ class VantaHomeShellTest {
         composeRule.onNodeWithText("WARDEN / PERMISSION GATE").assertExists()
         composeRule.onNodeWithText("REVIEW VANTA PERMISSIONS").assertExists()
     }
+    @Test
+    fun mirrorCreatesARealPrivateWorkspaceProfile() {
+        waitForHome()
+        composeRule.onNodeWithText("MIRROR").performClick()
+        composeRule.onNodeWithText("MIRROR / WORKSPACE PROFILES").assertExists()
+        composeRule.onNodeWithText("Workspace profile name").performTextInput("Emulator QA")
+        composeRule.onNodeWithText("CREATE WORKSPACE PROFILE").performClick()
+        composeRule.onNodeWithText("Emulator QA").assertExists()
+        composeRule.onNodeWithText("READY · APP-PRIVATE FILE WORKSPACE").assertExists()
+    }
+
+    @Test
+    fun oracleRoutesRequestToDirectiveForReview() {
+        waitForHome()
+        composeRule.onNodeWithText("ORACLE").performClick()
+        composeRule.onNodeWithText("ORACLE / LOCAL INTELLIGENCE ROUTER").assertExists()
+        composeRule.onNodeWithText("What should VANTA process?").performTextInput("task emulator smoke test")
+        composeRule.onNodeWithText("ROUTE TO DIRECTIVE").performClick()
+        composeRule.onNodeWithText("ORACLE routed the request to DIRECTIVE. Review it before processing.").assertExists()
+        composeRule.onNodeWithText("PROCESS DIRECTIVE").assertExists()
+    }
+
 }
