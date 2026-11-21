@@ -81,6 +81,8 @@ private fun VantaApp() {
     }
     var command by remember { mutableStateOf("") }
     var noteSearch by remember { mutableStateOf("") }
+    var noteDraft by remember { mutableStateOf("") }
+    var editingNote by remember { mutableStateOf<String?>(null) }
     val completedTasks = remember {
         mutableStateListOf<String>().apply {
             val saved = JSONArray(preferences.getString("completedTasks", "[]"))
@@ -339,13 +341,50 @@ private fun VantaApp() {
                                         if (noteSearch.isEmpty()) Text("Search saved notes…", color = Muted, fontSize = 12.sp)
                                         inner()
                                     })
+                                BasicTextField(value = noteDraft, onValueChange = { noteDraft = it },
+                                    modifier = Modifier.fillMaxWidth().background(Obsidian, RoundedCornerShape(8.dp)).padding(10.dp),
+                                    textStyle = TextStyle(color = White, fontSize = 12.sp),
+                                    decorationBox = { inner ->
+                                        if (noteDraft.isEmpty()) Text("Write a note or edit a selected note…", color = Muted, fontSize = 12.sp)
+                                        inner()
+                                    })
+                                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                                    Button(onClick = {
+                                        val value = noteDraft.trim()
+                                        if (value.isNotEmpty()) {
+                                            val oldNote = editingNote
+                                            if (oldNote == null) notes.add(0, value)
+                                            else {
+                                                val index = notes.indexOfFirst { it == oldNote }
+                                                if (index >= 0) notes[index] = value
+                                            }
+                                            persist("notes", notes)
+                                            noteDraft = ""
+                                            editingNote = null
+                                            feedback = if (oldNote == null) "Note saved locally." else "Note updated locally."
+                                        }
+                                    }, enabled = noteDraft.isNotBlank(),
+                                        colors = ButtonDefaults.buttonColors(containerColor = Amber, contentColor = Obsidian)) {
+                                        Text(if (editingNote == null) "SAVE NOTE" else "UPDATE NOTE", fontSize = 9.sp, fontWeight = FontWeight.Bold)
+                                    }
+                                    if (editingNote != null) {
+                                        Text("CANCEL", color = Muted, fontSize = 9.sp, modifier = Modifier.clickable {
+                                            noteDraft = ""; editingNote = null
+                                        }.padding(8.dp))
+                                    }
+                                }
                                 val filteredNotes = notes.filter { it.contains(noteSearch, ignoreCase = true) }
                                 Text("MATCHING NOTES · ${filteredNotes.size}", color = Amber, fontSize = 10.sp, fontWeight = FontWeight.Bold)
                                 filteredNotes.take(10).forEach { note ->
                                     Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
                                         Text("•  $note", color = White, fontSize = 11.sp, modifier = Modifier.weight(1f))
+                                        Text("EDIT", color = Amber, fontSize = 8.sp, modifier = Modifier.clickable {
+                                            editingNote = note
+                                            noteDraft = note
+                                        }.padding(5.dp))
                                         Text("DELETE", color = Muted, fontSize = 8.sp, modifier = Modifier.clickable {
                                             notes.remove(note); persist("notes", notes)
+                                            if (editingNote == note) { editingNote = null; noteDraft = "" }
                                         }.padding(5.dp))
                                     }
                                 }
